@@ -20,7 +20,7 @@ public class UpdateTests extends TestNGCitrusSpringSupport {
 
     public static final String URL = "http://localhost:2222";
 
-    @Test
+    @Test(description = "Проверка обновления у уточки цвета и высоты")
     @CitrusTest
     public void successfulChangeOfColorAndHeight(@Optional @CitrusResource TestCaseRunner runner){
         runner.variable("color", "yellow");
@@ -58,7 +58,7 @@ public class UpdateTests extends TestNGCitrusSpringSupport {
         );
     }
 
-    @Test
+    @Test(description = "Проверка обновления у уточки цвета и звука")
     @CitrusTest
     public void successfulChangeOfColorAndSound(@Optional @CitrusResource TestCaseRunner runner){
         runner.variable("color", "yellow");
