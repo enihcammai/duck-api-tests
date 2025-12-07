@@ -18,7 +18,7 @@ public class PropertiesTests extends TestNGCitrusSpringSupport {
 
     public static final String URL = "http://localhost:2222";
 
-    @Test(priority = 2, description = "1")
+    @Test(priority = 2, description = "Проверка того, что у четной уточки вернулись правильные свойства")
     @CitrusTest
     public void successfulGetEvenDuckProperties(@Optional @CitrusResource TestCaseRunner runner){
         PostCalls.createDuck(runner, "red", 0.03, "wood", "quack", "FIXED", URL);
@@ -35,7 +35,7 @@ public class PropertiesTests extends TestNGCitrusSpringSupport {
         );
     }
 
-    @Test(priority = 1, description = "2")
+    @Test(priority = 1, description = "Проверка того, что у нечетной уточки вернулись правильные свойства")
     @CitrusTest
     public void successfulGetOddDuckProperties(@Optional @CitrusResource TestCaseRunner runner){
         PostCalls.createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED", URL);

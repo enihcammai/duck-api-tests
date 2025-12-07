@@ -15,7 +15,7 @@ public class QuackTests extends TestNGCitrusSpringSupport {
 
     public static final String URL = "http://localhost:2222";
 
-    @Test(priority = 1)
+    @Test(priority = 1, description = "Проверка звука у нечетной уточки")
     @CitrusTest
     public void oddQuack(@Optional @CitrusResource TestCaseRunner runner) {
         PostCalls.createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED", URL);
@@ -23,7 +23,7 @@ public class QuackTests extends TestNGCitrusSpringSupport {
         Validator.validateSingleMessageResponse(runner, "sound", "quack", HttpStatus.OK, URL);
     }
 
-    @Test(priority = 2)
+    @Test(priority = 2, description = "Проверка звука у четной уточки")
     @CitrusTest
     public void evenQuack(@Optional @CitrusResource TestCaseRunner runner) {
         PostCalls.createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED", URL);

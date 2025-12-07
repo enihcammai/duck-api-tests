@@ -18,7 +18,7 @@ public class DeleteTests extends TestNGCitrusSpringSupport {
 
     public static final String URL = "http://localhost:2222";
 
-    @Test
+    @Test(description = "Проверка удаления уточки")
     @CitrusTest
     public void successfulDeleteDuck(@Optional @CitrusResource TestCaseRunner runner){
         PostCalls.createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED", URL);

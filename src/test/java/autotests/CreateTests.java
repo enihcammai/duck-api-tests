@@ -14,14 +14,14 @@ public class CreateTests extends TestNGCitrusSpringSupport {
 
     public static final String URL = "http://localhost:2222";
 
-    @Test
+    @Test(description = "Проверка создания резиновой уточки")
     @CitrusTest
     public void createRubberDuck(@Optional @CitrusResource TestCaseRunner runner) {
         PostCalls.createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED", URL);
         Validator.validateFullBodyResponse(runner, "material", "rubber", HttpStatus.OK, URL);
     }
 
-    @Test
+    @Test(description = "Проверка создания деревянной уточки")
     @CitrusTest
     public void createWoodDuck(@Optional @CitrusResource TestCaseRunner runner) {
         PostCalls.createDuck(runner, "red", 0.03, "wood", "quack", "FIXED", URL);

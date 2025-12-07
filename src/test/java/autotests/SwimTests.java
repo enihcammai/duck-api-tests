@@ -17,7 +17,7 @@ public class SwimTests extends TestNGCitrusSpringSupport {
 
     public static final String URL = "http://localhost:2222";
 
-    @Test
+    @Test(description = "Проверка того, что уточка не поплыла")
     @CitrusTest
     public void successfulSwim(@Optional @CitrusResource TestCaseRunner runner) {
         PostCalls.createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED", URL);
@@ -28,7 +28,7 @@ public class SwimTests extends TestNGCitrusSpringSupport {
     }
 
 
-    @Test
+    @Test(description = "Проверка того, что несуществующая уточка не поплыла")
     @CitrusTest
     public void nonExistingDuckSwim(@Optional @CitrusResource TestCaseRunner runner) {
         PostCalls.createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED", URL);
