@@ -1,6 +1,7 @@
 package autotests.tests;
 
-import autotests.client.DuckActionsClient;
+import autotests.clients.DuckActionsClient;
+import autotests.payloads.DuckProperties;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -10,20 +11,35 @@ import org.testng.annotations.Test;
 
 public class PropertiesTests extends DuckActionsClient {
 
-    @Test(priority = 2, description = "Проверка того, что у четной уточки вернулись правильные свойства")
+    // TODO: SHIFT-AQA-2
+    @Test(priority = 2, description = " ID - целое четное число. Есть в БД (утка с material = wood)")
     @CitrusTest
     public void successfulGetEvenDuckProperties(@Optional @CitrusResource TestCaseRunner runner){
-        createDuck(runner, "red", 0.03, "wood", "quack", "FIXED");
-        duckProperties(runner, "2");
-        validateEmptyBodyResponse(runner, HttpStatus.OK);
+        DuckProperties duckProperties = new DuckProperties()
+                .color("red")
+                .height(0.03)
+                .material("rubber")
+                .sound("quack")
+                .wingsState("FIXED");
+
+        createDuck(runner, duckProperties);
+        getDuckProperties(runner, "2");
+        validateEmptyBodyResponseWithString(runner, HttpStatus.OK);
     }
 
-    @Test(priority = 1, description = "Проверка того, что у нечетной уточки вернулись правильные свойства")
+    @Test(priority = 1, description = "ID - целое нечетное число. Есть в БД (утка с material = rubber)")
     @CitrusTest
     public void successfulGetOddDuckProperties(@Optional @CitrusResource TestCaseRunner runner){
-        createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED");
-        duckProperties(runner, "1");
-        validateFullBodyResponse(runner, "material", "rubber", HttpStatus.OK);
+        DuckProperties duckProperties = new DuckProperties()
+                .color("red")
+                .height(0.03)
+                .material("rubber")
+                .sound("quack")
+                .wingsState("FIXED");
+
+        createDuck(runner, duckProperties);
+        getDuckProperties(runner, "3");
+        validateFullBodyResponseWithResources(runner, "getDuckPropertiesTest/checkCreatedDuck.json", HttpStatus.OK);
     }
 
 }

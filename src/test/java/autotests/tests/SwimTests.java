@@ -1,6 +1,8 @@
 package autotests.tests;
 
-import autotests.client.DuckActionsClient;
+import autotests.clients.DuckActionsClient;
+import autotests.payloads.DuckProperties;
+import autotests.payloads.DuckSingleResponse;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
@@ -10,22 +12,40 @@ import org.testng.annotations.Test;
 
 
 public class SwimTests extends DuckActionsClient {
-    @Test(description = "Проверка того, что уточка не поплыла")
+
+    // TODO: SHIFT-AQA-1
+    @Test(description = "Существующий id ")
     @CitrusTest
     public void successfulSwim(@Optional @CitrusResource TestCaseRunner runner) {
-        createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED");
+        DuckProperties duckProperties = new DuckProperties()
+                .color("red")
+                .height(0.03)
+                .material("rubber")
+                .sound("quack")
+                .wingsState("FIXED");
+
+        createDuck(runner, duckProperties);
         String duckId = getDuckId(runner);
 
         duckSwim(runner, duckId);
-        validateSingleMessageResponse(runner, "message", "Paws are not found ((((", HttpStatus.NOT_FOUND);
+        DuckSingleResponse response = new DuckSingleResponse().message("Paws are not found ((((");
+        validateSingleMessageResponseWithPayload(runner, response, HttpStatus.NOT_FOUND);
     }
 
 
-    @Test(description = "Проверка того, что несуществующая уточка не поплыла")
+    @Test(description = "Несуществующий id ")
     @CitrusTest
     public void nonExistingDuckSwim(@Optional @CitrusResource TestCaseRunner runner) {
-        createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED");
+        DuckProperties duckProperties = new DuckProperties()
+                .color("red")
+                .height(0.03)
+                .material("rubber")
+                .sound("quack")
+                .wingsState("FIXED");
+
+        createDuck(runner, duckProperties);
         duckSwim(runner, "100");
-        validateSingleMessageResponse(runner, "message", "Paws are not found ((((", HttpStatus.NOT_FOUND);
+        DuckSingleResponse response = new DuckSingleResponse().message("Paws are not found ((((");
+        validateSingleMessageResponseWithPayload(runner, response, HttpStatus.NOT_FOUND);
     }
 }

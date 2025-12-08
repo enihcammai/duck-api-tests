@@ -1,11 +1,19 @@
-package autotests.client;
+package autotests.clients;
 
 import autotests.EndpointConfig;
+import autotests.payloads.DuckFullBodyResponse;
+import autotests.payloads.DuckProperties;
+import autotests.payloads.DuckSingleResponse;
+import autotests.payloads.DuckSoundSingleResponse;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.http.client.HttpClient;
+import com.consol.citrus.message.MessageType;
+import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
 import com.consol.citrus.testng.spring.TestNGCitrusSpringSupport;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
@@ -53,7 +61,7 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
-    public void duckProperties(TestCaseRunner runner, String id){
+    public void getDuckProperties(TestCaseRunner runner, String id){
         runner.$(
                 http()
                         .client(duckService)
@@ -63,7 +71,7 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
-    public void createDuck(TestCaseRunner runner, String color, double height, String material, String sound, String wingsState) {
+    public void createDuck(TestCaseRunner runner, DuckProperties properties) {
         runner.$(
                 http()
                         .client(duckService)
@@ -71,13 +79,7 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
                         .post("/api/duck/create")
                         .message()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .body("{" +
-                                "\"color\": \"" + color + "\"," +
-                                "\"height\": " + height + "," +
-                                "\"material\": \"" + material + "\"," +
-                                "\"sound\": \"" + sound + "\"," +
-                                "\"wingsState\": \"" + wingsState + "\"" +
-                                "}")
+                        .body(new ObjectMappingPayloadBuilder(properties, new ObjectMapper()))
         );
     }
 
@@ -118,6 +120,33 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
+//    Нужна доработка
+    public void validateFullBodyResponseWithPayload(TestCaseRunner runner, DuckFullBodyResponse response, HttpStatus responseCode) {
+        runner.$(
+                http()
+                        .client(duckService)
+                        .receive()
+                        .response(responseCode)
+                        .message()
+                        .type(MessageType.JSON)
+                        .body(new ObjectMappingPayloadBuilder(response, new ObjectMapper()))
+        );
+    }
+
+    public void validateFullBodyResponseWithResources(TestCaseRunner runner, String expectedPayload, HttpStatus responseCode) {
+        runner.$(
+                http()
+                        .client(duckService)
+                        .receive()
+                        .response(responseCode)
+                        .message()
+                        .type(MessageType.JSON)
+                        .body(new ClassPathResource(expectedPayload))
+        );
+    }
+
+
+
     public void validateSingleMessageResponse(TestCaseRunner runner, String responseKey, String responseValue, HttpStatus responseCode) {
         runner.$(
                 http()
@@ -130,28 +159,51 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
-    public void validateEmptyBodyResponse(TestCaseRunner runner, HttpStatus responseCode){
+    public void validateSingleMessageResponseWithPayload(TestCaseRunner runner, DuckSingleResponse response, HttpStatus responseCode) {
         runner.$(
                 http()
                         .client(duckService)
                         .receive()
                         .response(responseCode)
                         .message()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .type(MessageType.JSON)
+                        .body(new ObjectMappingPayloadBuilder(response, new ObjectMapper()))
+        );
+    }
+
+    public void validateSoundSingleMessageResponseWithPayload(TestCaseRunner runner, DuckSoundSingleResponse response, HttpStatus responseCode){
+        runner.$(
+                http()
+                        .client(duckService)
+                        .receive()
+                        .response(responseCode)
+                        .message()
+                        .type(MessageType.JSON)
+                        .body(new ObjectMappingPayloadBuilder(response, new ObjectMapper()))
+        );
+    }
+
+    public void validateEmptyBodyResponseWithString(TestCaseRunner runner, HttpStatus responseCode){
+        runner.$(
+                http()
+                        .client(duckService)
+                        .receive()
+                        .response(responseCode)
+                        .message()
+                        .type(MessageType.JSON)
                         .body("{}")
         );
     }
 
-    public void multipleValidate(TestCaseRunner runner, String responseKey1, String responseKey2, String responseValue1, String responseValue2, HttpStatus responseCode){
+    public void validateResponseWithResources(TestCaseRunner runner, String expectedPayload, HttpStatus responseCode){
         runner.$(
                 http()
                         .client(duckService)
                         .receive()
                         .response(responseCode)
                         .message()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .validate(jsonPath().expression("$." + responseKey1, responseValue1))
-                        .validate(jsonPath().expression("$." + responseKey2, responseValue2))
+                        .type(MessageType.JSON)
+                        .body(new ClassPathResource(expectedPayload))
         );
     }
 
