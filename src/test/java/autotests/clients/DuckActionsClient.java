@@ -2,8 +2,6 @@ package autotests.clients;
 
 import autotests.EndpointConfig;
 import autotests.payloads.DuckProperties;
-import autotests.payloads.DuckSingleResponse;
-import autotests.payloads.DuckSoundSingleResponse;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.context.TestContext;
 import com.consol.citrus.http.client.HttpClient;
@@ -116,7 +114,8 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
                         .receive()
                         .response(responseCode)
                         .message()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .type(MessageType.JSON)
+                        .validate(jsonPath().expression("$.id", "@isNumber()@"))
                         .validate(jsonPath().expression("$.color", color))
                         .validate(jsonPath().expression("$.height", height))
                         .validate(jsonPath().expression("$.material", material))

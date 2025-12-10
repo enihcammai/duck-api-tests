@@ -50,7 +50,6 @@ public class CreateTests extends DuckActionsClient {
                 .wingsState("FIXED");
 
         createDuck(runner, duckProperties);
-        // В общем id он не хочет воспринимать, поэтому проверяю все остальные поля
         validateFullBodyResponse(runner, "red", 0.03, "wood", "quack", "FIXED", HttpStatus.OK);
     }
 }

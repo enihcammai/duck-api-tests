@@ -45,9 +45,10 @@ public class SwimTests extends DuckActionsClient {
                 .wingsState("FIXED");
 
         createDuck(runner, duckProperties);
-        int duckId = Integer.parseInt(getDuckId(runner, context)) * 2;
+        String duckId = getDuckId(runner, context);
 
-        duckSwim(runner, String.valueOf(duckId));
+        deleteDuck(runner, duckId);
+        duckSwim(runner, duckId);
         DuckSingleResponse response = new DuckSingleResponse().message("Paws are not found ((((");
         validatePayload(runner, response, HttpStatus.NOT_FOUND);
     }
