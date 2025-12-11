@@ -9,13 +9,17 @@ import com.consol.citrus.message.MessageType;
 import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
 import com.consol.citrus.testng.spring.TestNGCitrusSpringSupport;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Step;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.test.context.ContextConfiguration;
 
+import static com.consol.citrus.actions.ExecuteSQLAction.Builder.sql;
+import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
 import static com.consol.citrus.dsl.JsonPathSupport.jsonPath;
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
 import static com.consol.citrus.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
@@ -24,10 +28,19 @@ import static com.consol.citrus.validation.DelegatingPayloadVariableExtractor.Bu
 public class DuckActionsClient extends TestNGCitrusSpringSupport {
 
     @Autowired
+    protected SingleConnectionDataSource testDb;
+
+    @Autowired
     @Qualifier("duckService")
     protected HttpClient duckService;
 
 
+    public void databaseUpdate(TestCaseRunner runner, String sql) {
+        runner.$(sql(testDb)
+                .statement(sql));
+    }
+
+    @Step("Уточка плывёт")
     public void duckSwim(TestCaseRunner runner, String id) {
         runner.$(
                 http()
@@ -38,6 +51,7 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
+    @Step("Уточка летит")
     public void duckFly(TestCaseRunner runner, String id) {
         runner.$(
                 http()
@@ -48,6 +62,7 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
+    @Step("Уточка крякает")
     public void duckQuack(TestCaseRunner runner, String id, String repCount, String soundCount) {
         runner.$(
                 http()
@@ -60,6 +75,7 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
+    @Step("Получаем свойства уточки")
     public void getDuckProperties(TestCaseRunner runner, String id) {
         runner.$(
                 http()
@@ -70,6 +86,7 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
+    @Step("Создаём уточку")
     public void createDuck(TestCaseRunner runner, DuckProperties properties) {
         runner.$(
                 http()
@@ -82,6 +99,7 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
+    @Step("Удаляем уточку")
     public void deleteDuck(TestCaseRunner runner, String id) {
         runner.$(
                 http()
@@ -92,6 +110,7 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
+    @Step("Изменяем уточку")
     public void updateDuck(TestCaseRunner runner, String id, String color, String height, String material, String sound, String wingsState) {
         runner.$(
                 http()
@@ -107,7 +126,8 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
-    public void validateFullBodyResponse(TestCaseRunner runner, String color, double height, String material, String sound, String wingsState, HttpStatus responseCode) {
+    @Step("Проверяем полное тело ответа")
+    public void validateFullBodyResponse(TestCaseRunner runner, String id, String color, double height, String material, String sound, String wingsState, HttpStatus responseCode) {
         runner.$(
                 http()
                         .client(duckService)
@@ -124,7 +144,8 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
-    //    Нужна доработка
+
+    @Step("Проверяем ответ с помощью Payload")
     public void validatePayload(TestCaseRunner runner, Object response, HttpStatus responseCode) {
         runner.$(
                 http()
@@ -137,7 +158,19 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
+    @Step("Проверяем ответ с помощью базы данных")
+    protected void validateDuckInDatabase(TestCaseRunner runner, String id, String color, String height,
+                                          String material, String sound, String wingsState) {
+        runner.$(query(testDb)
+                .statement("SELECT * FROM DUCK WHERE ID=" + id)
+                .validate("COLOR", color)
+                .validate("HEIGHT", height)
+                .validate("MATERIAL", material)
+                .validate("SOUND", sound)
+                .validate("WINGS_STATE", wingsState));
+    }
 
+    @Step("Проверяем пустое тело ответа")
     public void validateEmptyBodyResponseWithString(TestCaseRunner runner, HttpStatus responseCode) {
         runner.$(
                 http()
@@ -150,6 +183,7 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
+    @Step("Проверяем с помощью файлов с ресурсами")
     public void validateResources(TestCaseRunner runner, String expectedPayload, HttpStatus responseCode) {
         runner.$(
                 http()
@@ -162,6 +196,7 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
         );
     }
 
+    @Step("Получаем id уточки")
     public String getDuckId(TestCaseRunner runner, TestContext context) {
         runner.$(
                 http()
@@ -177,5 +212,18 @@ public class DuckActionsClient extends TestNGCitrusSpringSupport {
     }
 
 
+    @Step("Получаем переменную с id уточки")
+    public void getDuckId1(TestCaseRunner runner) {
+        runner.$(
+                http()
+                        .client(duckService)
+                        .receive()
+                        .response(HttpStatus.OK)
+                        .message()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .extract(fromBody().expression("$.id", "duckId"))
+        );
+
+    }
 }
 

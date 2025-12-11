@@ -7,16 +7,22 @@ import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
 
+@Epic("Тесты на duck-action-controller")
+@Feature("Полёт уточки")
+@Story("Эндпоинт /api/duck/action/fly")
 public class FlyTests extends DuckActionsClient {
 
     @Test(description = "Существующий id со связанными крыльями")
     @CitrusTest
-    public void flyWithFixedWings(@Optional @CitrusResource TestCaseRunner runner, @Optional @CitrusResource TestContext context) {
+    public void flyWithFixedWings(@Optional @CitrusResource TestCaseRunner runner) {
         DuckProperties duckProperties = new DuckProperties()
                 .color("yellow")
                 .height(0.1)
@@ -25,16 +31,16 @@ public class FlyTests extends DuckActionsClient {
                 .wingsState("FIXED");
 
         createDuck(runner, duckProperties);
-        String duckId = getDuckId(runner, context);
+        getDuckId1(runner);
 
-        duckFly(runner, duckId);
+        duckFly(runner, "${duckId}");
         DuckSingleResponse validator = new DuckSingleResponse().message("I can not fly :C");
         validatePayload(runner, validator, HttpStatus.OK);
     }
 
     @Test(description = "Существующий id с активными крыльями")
     @CitrusTest
-    public void flyWithActiveWings(@Optional @CitrusResource TestCaseRunner runner, @Optional @CitrusResource TestContext context) {
+    public void flyWithActiveWings(@Optional @CitrusResource TestCaseRunner runner) {
         DuckProperties duckProperties = new DuckProperties()
                 .color("yellow")
                 .height(0.1)
@@ -43,16 +49,16 @@ public class FlyTests extends DuckActionsClient {
                 .wingsState("ACTIVE");
 
         createDuck(runner, duckProperties);
-        String duckId = getDuckId(runner, context);
+        getDuckId1(runner);
 
-        duckFly(runner, duckId);
+        duckFly(runner, "${duckId}");
         DuckSingleResponse validator = new DuckSingleResponse().message("I am flying :)");
         validatePayload(runner, validator, HttpStatus.OK);
     }
 
     @Test(description = "Существующий id с крыльями в неопределенном состоянии")
     @CitrusTest
-    public void flyWithUndefinedWings(@Optional @CitrusResource TestCaseRunner runner, @Optional @CitrusResource TestContext context) {
+    public void flyWithUndefinedWings(@Optional @CitrusResource TestCaseRunner runner) {
         DuckProperties duckProperties = new DuckProperties()
                 .color("yellow")
                 .height(0.1)
@@ -61,9 +67,9 @@ public class FlyTests extends DuckActionsClient {
                 .wingsState("UNDEFINED");
 
         createDuck(runner, duckProperties);
-        String duckId = getDuckId(runner, context);
+        getDuckId1(runner);
 
-        duckFly(runner, duckId);
+        duckFly(runner, "${duckId}");
         DuckSingleResponse validator = new DuckSingleResponse().message("Wings are not detected :(");
         validatePayload(runner, validator, HttpStatus.OK);
     }

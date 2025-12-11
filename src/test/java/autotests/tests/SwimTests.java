@@ -7,11 +7,17 @@ import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import com.consol.citrus.context.TestContext;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import org.springframework.http.HttpStatus;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
 
+@Epic("Тесты на duck-action-controller")
+@Feature("Плавание уточки")
+@Story("Эндпоинт /api/duck/action/swim")
 public class SwimTests extends DuckActionsClient {
 
     // TODO: SHIFT-AQA-1
