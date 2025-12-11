@@ -6,7 +6,6 @@ import autotests.payloads.DuckSingleResponse;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
@@ -31,7 +30,7 @@ public class FlyTests extends DuckActionsClient {
                 .wingsState("FIXED");
 
         createDuck(runner, duckProperties);
-        getDuckId1(runner);
+        extractId(runner);
 
         duckFly(runner, "${duckId}");
         DuckSingleResponse validator = new DuckSingleResponse().message("I can not fly :C");
@@ -49,7 +48,7 @@ public class FlyTests extends DuckActionsClient {
                 .wingsState("ACTIVE");
 
         createDuck(runner, duckProperties);
-        getDuckId1(runner);
+        extractId(runner);
 
         duckFly(runner, "${duckId}");
         DuckSingleResponse validator = new DuckSingleResponse().message("I am flying :)");
@@ -67,7 +66,7 @@ public class FlyTests extends DuckActionsClient {
                 .wingsState("UNDEFINED");
 
         createDuck(runner, duckProperties);
-        getDuckId1(runner);
+        extractId(runner);
 
         duckFly(runner, "${duckId}");
         DuckSingleResponse validator = new DuckSingleResponse().message("Wings are not detected :(");

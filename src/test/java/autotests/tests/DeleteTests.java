@@ -29,7 +29,7 @@ public class DeleteTests extends DuckActionsClient {
                 .wingsState("FIXED");
 
         createDuck(runner, duckProperties);
-        getDuckId1(runner);
+        extractId(runner);
 
         databaseUpdate(runner, """
                 delete from DUCK

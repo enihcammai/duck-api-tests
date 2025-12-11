@@ -5,10 +5,13 @@ import autotests.payloads.DuckProperties;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
+import com.consol.citrus.context.TestContext;
+import com.consol.citrus.testng.CitrusParameters;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
 import org.springframework.http.HttpStatus;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
 
@@ -16,30 +19,45 @@ import org.testng.annotations.Test;
 @Feature("Создание уточки")
 @Story("Эндпоинт /api/duck/create")
 public class CreateTests extends DuckActionsClient {
+    DuckProperties yellowDuckProperties = new DuckProperties()
+            .color("yellow")
+            .height(0.03)
+            .material("rubber")
+            .sound("quack")
+            .wingsState("FIXED");
+    DuckProperties greenDuckProperties = new DuckProperties()
+            .color("green")
+            .height(0.03)
+            .material("rubber")
+            .sound("quack")
+            .wingsState("FIXED");
+    DuckProperties redDuckProperties = new DuckProperties()
+            .color("red")
+            .height(0.03)
+            .material("rubber")
+            .sound("quack")
+            .wingsState("FIXED");
+    DuckProperties purpleDuckProperties = new DuckProperties()
+            .color("purple")
+            .height(0.03)
+            .material("rubber")
+            .sound("quack")
+            .wingsState("FIXED");
+    DuckProperties orangeDuckProperties = new DuckProperties()
+            .color("orange")
+            .height(0.03)
+            .material("rubber")
+            .sound("quack")
+            .wingsState("FIXED");
 
-    @Test(description = "Создать резиновую утку")
+    @Test(description = "Создать резиновую утку", dataProvider = "colorDuckList")
     @CitrusTest
-    public void createRubberDuck(@Optional @CitrusResource TestCaseRunner runner) {
-        DuckProperties duckPropertiesForCreate = new DuckProperties()
-                .color("red")
-                .height(0.03)
-                .material("rubber")
-                .sound("quack")
-                .wingsState("FIXED");
-
-        createDuck(runner, duckPropertiesForCreate);
-
-
-        getDuckId1(runner);
-        DuckProperties duckPropertiesForValidation = new DuckProperties()
-                .color("red")
-                .height(3.0)
-                .material("rubber")
-                .sound("quack")
-                .wingsState("FIXED");
-
+    @CitrusParameters({"payload", "response", "runner"})
+    public void createRubberDuck(Object payload, String response, @Optional @CitrusResource TestCaseRunner runner) {
+        createDuck(runner, payload);
+        extractId(runner);
         getDuckProperties(runner, "${duckId}");
-        validatePayload(runner, duckPropertiesForValidation, HttpStatus.OK);
+        validateResources(runner, response, HttpStatus.OK);
     }
 
     @Test(description = "Создать деревянную утку")
@@ -49,6 +67,17 @@ public class CreateTests extends DuckActionsClient {
                 "insert into DUCK (id, color, height, material, sound, wings_state)\n" +
                         "values (1338, 'orange', 3.0, 'cheese', 'hrum','ACTIVE');");
 
-        validateDuckInDatabase(runner, "1234", "orange", "3.0", "cheese", "hrum", "ACTIVE");
+        validateDuckInDatabase(runner, "1338", "orange", "3.0", "cheese", "hrum", "ACTIVE");
+    }
+
+    @DataProvider(name = "colorDuckList")
+    public Object[][] duckProvider() {
+        return new Object[][]{
+                {yellowDuckProperties, "getDuckPropertiesTest/yellowDuck.json", null},
+                {greenDuckProperties, "getDuckPropertiesTest/greenDuck.json", null},
+                {redDuckProperties, "getDuckPropertiesTest/redDuck.json", null},
+                {purpleDuckProperties, "getDuckPropertiesTest/purpleDuck.json", null},
+                {orangeDuckProperties, "getDuckPropertiesTest/orangeDuck.json", null}
+        };
     }
 }

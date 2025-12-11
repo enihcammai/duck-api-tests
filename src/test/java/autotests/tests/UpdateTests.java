@@ -32,7 +32,7 @@ public class UpdateTests extends DuckActionsClient {
 
         createDuck(runner, duckProperties);
 
-        getDuckId1(runner);
+        extractId(runner);
         updateDuck(runner, "${duckId}", "yellow", "0.06", "rubber", "quack", "FIXED");
 
         DuckSingleResponse response = new DuckSingleResponse().message("Duck with id = ${duckId} is updated");
