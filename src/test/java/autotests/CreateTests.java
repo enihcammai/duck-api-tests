@@ -18,13 +18,13 @@ public class CreateTests extends TestNGCitrusSpringSupport {
     @CitrusTest
     public void createRubberDuck(@Optional @CitrusResource TestCaseRunner runner) {
         PostCalls.createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED", URL);
-        Validator.validateFullBodyResponse(runner, "material", "rubber", HttpStatus.OK, URL);
+        Validator.validateCreate(runner, "red", 3.0, "rubber", "quack", "FIXED", URL, HttpStatus.OK);
     }
 
     @Test(description = "Проверка создания деревянной уточки")
     @CitrusTest
     public void createWoodDuck(@Optional @CitrusResource TestCaseRunner runner) {
         PostCalls.createDuck(runner, "red", 0.03, "wood", "quack", "FIXED", URL);
-        Validator.validateFullBodyResponse(runner, "material", "wood", HttpStatus.OK, URL);
+        Validator.validateCreate(runner, "red", 3.0,"wood","quack", "FIXED", URL, HttpStatus.OK);
     }
 }

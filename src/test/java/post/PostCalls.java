@@ -4,6 +4,7 @@ import com.consol.citrus.TestCaseRunner;
 import org.springframework.http.MediaType;
 
 import static com.consol.citrus.http.actions.HttpActionBuilder.http;
+import static com.consol.citrus.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
 
 public class PostCalls {
 
@@ -15,13 +16,13 @@ public class PostCalls {
                         .post("/api/duck/create")
                         .message()
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .body(("{" +
+                        .body("{" +
                                 "\"color\": \"" + color + "\"," +
                                 "\"height\": " + height + "," +
                                 "\"material\": \"" + material + "\"," +
                                 "\"sound\": \"" + sound + "\"," +
                                 "\"wingsState\": \"" + wingsState + "\"" +
-                                "}"))
+                                "}")
         );
     }
 }

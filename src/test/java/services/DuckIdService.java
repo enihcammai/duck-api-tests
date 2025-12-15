@@ -1,6 +1,7 @@
 package services;
 
 import com.consol.citrus.TestCaseRunner;
+import com.consol.citrus.context.TestContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -22,4 +23,17 @@ public class DuckIdService {
 
         return "${duckId}";
     }
+
+    static public void extractId(TestCaseRunner runner, String URL){
+        runner.$(
+                http()
+                        .client(URL)
+                        .receive()
+                        .response(HttpStatus.OK)
+                        .message()
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .extract(fromBody().expression("$.id", "duckId"))
+        );
+    }
+
 }
