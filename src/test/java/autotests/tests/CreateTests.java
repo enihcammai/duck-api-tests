@@ -24,18 +24,7 @@ public class CreateTests extends DuckActionsClient {
                 .wingsState("FIXED");
 
         createDuck(runner, duckPropertiesForCreate);
-
-        String duckId = getDuckId(runner, context);
-
-        DuckProperties duckPropertiesForValidation = new DuckProperties()
-                .color("red")
-                .height(3.0)
-                .material("rubber")
-                .sound("quack")
-                .wingsState("FIXED");
-
-        getDuckProperties(runner, duckId);
-        validatePayload(runner, duckPropertiesForValidation, HttpStatus.OK);
+        validateResources(runner, "getDuckPropertiesTest/checkDuckID", HttpStatus.OK);
     }
 
 
