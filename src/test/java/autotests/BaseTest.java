@@ -143,26 +143,6 @@ public class BaseTest extends TestNGCitrusSpringSupport {
         );
     }
 
-    public void validateFullBodyResponse(TestCaseRunner runner, String color, double height, String material, String sound, String wingsState, HttpStatus responseCode) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .receive()
-                        .response(responseCode)
-                        .message()
-                        .type(MessageType.JSON)
-                        .extract(fromBody().expression("$.id", "duckId"))
-                        .validate(jsonPath().expression("$.id", "${duckId}"))
-                        .validate(jsonPath().expression("$.color", color))
-                        .validate(jsonPath().expression("$.height", height))
-                        .validate(jsonPath().expression("$.material", material))
-                        .validate(jsonPath().expression("$.sound", sound))
-                        .validate(jsonPath().expression("$.wingsState", wingsState))
-        );
-    }
-
-
-
     protected void extractId(TestCaseRunner runner) {
         runner.$(
                 http()

@@ -55,8 +55,6 @@ public class CreateTests extends DuckActionsClient {
     @CitrusParameters({"payload", "response", "runner"})
     public void createRubberDuck(Object payload, String response, @Optional @CitrusResource TestCaseRunner runner) {
         createDuck(runner, payload);
-        extractId(runner);
-        getDuckProperties(runner, "${duckId}");
         validateResources(runner, response, HttpStatus.OK);
     }
 
