@@ -1,7 +1,6 @@
 package services;
 
 import com.consol.citrus.TestCaseRunner;
-import com.consol.citrus.message.MessageType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
@@ -47,16 +46,14 @@ public class Validator {
                         .receive()
                         .response(responseCode)
                         .message()
-                        .type(MessageType.JSON)
-                        .extract(fromBody().expression("${id}", "duckId"))
-                        .body("{" +
-                                "\"id\": \"" + "${duckId}" + "\"," +
-                                "\"color\": \"" + color + "\"," +
-                                "\"height\": " + height + "," +
-                                "\"material\": \"" + material + "\"," +
-                                "\"sound\": \"" + sound + "\"," +
-                                "\"wingsState\": \"" + wingsState + "\"" +
-                                "}")
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                        .extract(fromBody().expression("$.id", "duckId"))
+                        .validate(jsonPath().expression("$.id", "${duckId}"))
+                        .validate(jsonPath().expression("$.color", color))
+                        .validate(jsonPath().expression("$.height", height))
+                        .validate(jsonPath().expression("$.material", material))
+                        .validate(jsonPath().expression("$.sound", sound))
+                        .validate(jsonPath().expression("$.wingsState", wingsState))
         );
     }
 

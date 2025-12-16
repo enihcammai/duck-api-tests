@@ -3,6 +3,7 @@ package autotests;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
+import com.consol.citrus.context.TestContext;
 import com.consol.citrus.testng.spring.TestNGCitrusSpringSupport;
 import get.GetCalls;
 import org.springframework.http.HttpStatus;
@@ -21,16 +22,16 @@ public class PropertiesTests extends TestNGCitrusSpringSupport {
 
     @Test(priority = 2, description = "Проверка того, что у четной уточки вернулись правильные свойства")
     @CitrusTest
-    public void successfulGetEvenDuckProperties(@Optional @CitrusResource TestCaseRunner runner) {
+    public void successfulGetEvenDuckProperties(@Optional @CitrusResource TestCaseRunner runner, @Optional @CitrusResource TestContext context) {
         PostCalls.createDuck(runner, "red", 0.03, "wood", "quack", "FIXED", URL);
 
-        DuckIdService.extractId(runner, URL);
-        while(Integer.parseInt("${duckId}") % 2 != 0){
+        String duckId = DuckIdService.extractId(runner, context,  URL);
+        while(Integer.parseInt(duckId) % 2 != 0){
             PostCalls.createDuck(runner, "red", 0.03, "wood", "quack", "FIXED", URL);
-            DuckIdService.extractId(runner, URL);
+            duckId = DuckIdService.extractId(runner, context, URL);
         }
 
-        GetCalls.duckProperties(runner, "${duckId}", URL);
+        GetCalls.duckProperties(runner, duckId, URL);
         runner.$(
                 http()
                         .client(URL)
@@ -44,16 +45,16 @@ public class PropertiesTests extends TestNGCitrusSpringSupport {
 
     @Test(priority = 1, description = "Проверка того, что у нечетной уточки вернулись правильные свойства")
     @CitrusTest
-    public void successfulGetOddDuckProperties(@Optional @CitrusResource TestCaseRunner runner) {
+    public void successfulGetOddDuckProperties(@Optional @CitrusResource TestCaseRunner runner, @Optional @CitrusResource TestContext context) {
         PostCalls.createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED", URL);
 
-        DuckIdService.extractId(runner, URL);
-        while(Integer.parseInt("${duckId}") % 2 == 0){
-            PostCalls.createDuck(runner, "red", 0.03, "wood", "quack", "FIXED", URL);
-            DuckIdService.extractId(runner, URL);
+        String duckId = DuckIdService.extractId(runner, context,  URL);
+        while(Integer.parseInt(duckId) % 2 == 0){
+            PostCalls.createDuck(runner, "red", 0.03, "rubber", "quack", "FIXED", URL);
+            duckId = DuckIdService.extractId(runner, context, URL);
         }
 
-        GetCalls.duckProperties(runner, "${duckId}", URL);
+        GetCalls.duckProperties(runner, duckId, URL);
         Validator.validateFullBodyResponse(runner, "red", 3.0, "rubber", "quack", "FIXED", HttpStatus.OK, URL);
     }
 

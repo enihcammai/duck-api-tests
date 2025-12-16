@@ -24,7 +24,7 @@ public class DuckIdService {
         return "${duckId}";
     }
 
-    static public void extractId(TestCaseRunner runner, String URL){
+    static public String extractId(TestCaseRunner runner, TestContext context, String URL){
         runner.$(
                 http()
                         .client(URL)
@@ -34,6 +34,8 @@ public class DuckIdService {
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                         .extract(fromBody().expression("$.id", "duckId"))
         );
+
+        return context.getVariable("${duckId}");
     }
 
 }
