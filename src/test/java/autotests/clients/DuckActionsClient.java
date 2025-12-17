@@ -1,182 +1,77 @@
 package autotests.clients;
 
+import autotests.BaseTest;
 import autotests.EndpointConfig;
-import autotests.payloads.DuckProperties;
 import com.consol.citrus.TestCaseRunner;
-import com.consol.citrus.context.TestContext;
-import com.consol.citrus.http.client.HttpClient;
-import com.consol.citrus.message.MessageType;
-import com.consol.citrus.message.builder.ObjectMappingPayloadBuilder;
-import com.consol.citrus.testng.spring.TestNGCitrusSpringSupport;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
+import io.qameta.allure.Step;
 import org.springframework.test.context.ContextConfiguration;
 
-import static com.consol.citrus.dsl.JsonPathSupport.jsonPath;
-import static com.consol.citrus.http.actions.HttpActionBuilder.http;
-import static com.consol.citrus.validation.DelegatingPayloadVariableExtractor.Builder.fromBody;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 
 @ContextConfiguration(classes = {EndpointConfig.class})
-public class DuckActionsClient extends TestNGCitrusSpringSupport {
+public class DuckActionsClient extends BaseTest {
 
-    @Autowired
-    @Qualifier("duckService")
-    protected HttpClient duckService;
-
-
+    @Step("Уточка плывёт")
     public void duckSwim(TestCaseRunner runner, String id) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .send()
-                        .get("/api/duck/action/swim")
-                        .queryParam("id", id)
-        );
+        sendGetRequest(runner, duckService, "/api/duck/action/swim", "id", id);
     }
 
+    @Step("Уточка летит")
     public void duckFly(TestCaseRunner runner, String id) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .send()
-                        .get("/api/duck/action/fly")
-                        .queryParam("id", id)
-        );
+        sendGetRequest(runner, duckService, "/api/duck/action/fly", "id", id);
     }
 
+    @Step("Уточка крякает")
     public void duckQuack(TestCaseRunner runner, String id, String repCount, String soundCount) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .send()
-                        .get("/api/duck/action/quack")
-                        .queryParam("id", id)
-                        .queryParam("repetitionCount", repCount)
-                        .queryParam("soundCount", soundCount)
-        );
+        Map<String, String> params = new HashMap<>();
+        params.put("id", id);
+        params.put("repetitionCount", repCount);
+        params.put("soundCount", soundCount);
+
+        sendMultiParamGetRequest(runner, duckService, "/api/duck/action/quack", params);
     }
 
+    @Step("Получаем свойства уточки")
     public void getDuckProperties(TestCaseRunner runner, String id) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .send()
-                        .get("/api/duck/action/properties")
-                        .queryParam("id", id)
-        );
+        sendGetRequest(runner, duckService, "/api/duck/action/properties", "id", id);
     }
 
-    public void createDuck(TestCaseRunner runner, DuckProperties properties) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .send()
-                        .post("/api/duck/create")
-                        .message()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .body(new ObjectMappingPayloadBuilder(properties, new ObjectMapper()))
-        );
+    @Step("Создаём уточку")
+    public void createDuck(TestCaseRunner runner, Object payload) {
+        sendPostRequest(runner, duckService, "/api/duck/create", payload);
     }
 
+    @Step("Создаём уточку через БД")
+    public Integer createDuckInDB(TestCaseRunner runner, String color, String height, String material, String sound, String wingsState) {
+        Random random = new Random();
+        int id = (int) System.currentTimeMillis() % 1000000 + random.nextInt(1000);
+        databaseUpdate(runner,
+                "insert into DUCK (id, color, height, material, sound, wings_state)\n" +
+                        "values (" + id + ", '" + color + "', " + height + ", '" + material + "', '" + sound + "','" + wingsState + "');");
+
+        runner.variable("duckId", Integer.toString(id));
+
+        return id;
+    }
+
+    @Step("Удаляем уточку")
     public void deleteDuck(TestCaseRunner runner, String id) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .send()
-                        .delete("/api/duck/delete")
-                        .queryParam("id", id)
-        );
+        sendDeleteRequest(runner, duckService, "/api/duck/delete", "id", id);
     }
 
+    @Step("Изменяем уточку")
     public void updateDuck(TestCaseRunner runner, String id, String color, String height, String material, String sound, String wingsState) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .send()
-                        .put("/api/duck/update")
-                        .queryParam("color", color)
-                        .queryParam("height", height)
-                        .queryParam("id", id)
-                        .queryParam("material", material)
-                        .queryParam("sound", sound)
-                        .queryParam("wingsState", wingsState)
-        );
+        Map<String, String> params = new HashMap<>();
+        params.put("color", color);
+        params.put("height", height);
+        params.put("id", id);
+        params.put("material", material);
+        params.put("sound", sound);
+        params.put("wingsState", wingsState);
+
+        sendFlexibleParamUpdateRequest(runner, duckService, "/api/duck/update", params);
     }
-
-    public void validateFullBodyResponse(TestCaseRunner runner, String color, double height, String material, String sound, String wingsState, HttpStatus responseCode) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .receive()
-                        .response(responseCode)
-                        .message()
-                        .type(MessageType.JSON)
-                        .extract(fromBody().expression("$.id", "duckId"))
-                        .validate(jsonPath().expression("$.id", "${duckId}"))
-                        .validate(jsonPath().expression("$.color", color))
-                        .validate(jsonPath().expression("$.height", height))
-                        .validate(jsonPath().expression("$.material", material))
-                        .validate(jsonPath().expression("$.sound", sound))
-                        .validate(jsonPath().expression("$.wingsState", wingsState))
-        );
-    }
-
-    //    Нужна доработка
-    public void validatePayload(TestCaseRunner runner, Object response, HttpStatus responseCode) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .receive()
-                        .response(responseCode)
-                        .message()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .body(new ObjectMappingPayloadBuilder(response, new ObjectMapper()))
-        );
-    }
-
-
-    public void validateEmptyBodyResponseWithString(TestCaseRunner runner, HttpStatus responseCode) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .receive()
-                        .response(responseCode)
-                        .message()
-                        .type(MessageType.JSON)
-                        .body("{}")
-        );
-    }
-
-    public void validateResources(TestCaseRunner runner, String expectedPayload, HttpStatus responseCode) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .receive()
-                        .response(responseCode)
-                        .message()
-                        .type(MessageType.JSON)
-                        .body(new ClassPathResource(expectedPayload))
-        );
-    }
-
-    public String getDuckId(TestCaseRunner runner, TestContext context) {
-        runner.$(
-                http()
-                        .client(duckService)
-                        .receive()
-                        .response(HttpStatus.OK)
-                        .message()
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                        .extract(fromBody().expression("$.id", "duckId"))
-        );
-
-        return context.getVariable("${duckId}");
-    }
-
-
 }
 
