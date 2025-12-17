@@ -8,6 +8,7 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @ContextConfiguration(classes = {EndpointConfig.class})
 public class DuckActionsClient extends BaseTest {
@@ -40,6 +41,19 @@ public class DuckActionsClient extends BaseTest {
     @Step("Создаём уточку")
     public void createDuck(TestCaseRunner runner, Object payload) {
         sendPostRequest(runner, duckService, "/api/duck/create", payload);
+    }
+
+    @Step("Создаём уточку через БД")
+    public Integer createDuckInDB(TestCaseRunner runner, String color, String height, String material, String sound, String wingsState) {
+        Random random = new Random();
+        int id = (int) System.currentTimeMillis() % 1000000 + random.nextInt(1000);
+        databaseUpdate(runner,
+                "insert into DUCK (id, color, height, material, sound, wings_state)\n" +
+                        "values (" + id + ", '" + color + "', " + height + ", '" + material + "', '" + sound + "','" + wingsState + "');");
+
+        runner.variable("duckId", Integer.toString(id));
+
+        return id;
     }
 
     @Step("Удаляем уточку")

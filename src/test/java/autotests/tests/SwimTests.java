@@ -24,17 +24,8 @@ public class SwimTests extends DuckActionsClient {
     @Test(description = "Существующий id ")
     @CitrusTest
     public void successfulSwim(@Optional @CitrusResource TestCaseRunner runner, @Optional @CitrusResource TestContext context) {
-        DuckProperties duckProperties = new DuckProperties()
-                .color("red")
-                .height(0.03)
-                .material("rubber")
-                .sound("quack")
-                .wingsState("FIXED");
-
-        createDuck(runner, duckProperties);
-        String duckId = getDuckId(runner, context);
-
-        duckSwim(runner, duckId);
+        createDuckInDB(runner, "yellow", "0.03", "rubber", "quack", "ACTIVE");
+        duckSwim(runner, "${duckId}");
         DuckSingleResponse response = new DuckSingleResponse().message("Paws are not found ((((");
         validatePayload(runner, response, HttpStatus.NOT_FOUND);
     }
@@ -43,18 +34,9 @@ public class SwimTests extends DuckActionsClient {
     @Test(description = "Несуществующий id")
     @CitrusTest
     public void nonExistingDuckSwim(@Optional @CitrusResource TestCaseRunner runner, @Optional @CitrusResource TestContext context) {
-        DuckProperties duckProperties = new DuckProperties()
-                .color("red")
-                .height(0.03)
-                .material("rubber")
-                .sound("quack")
-                .wingsState("FIXED");
-
-        createDuck(runner, duckProperties);
-        String duckId = getDuckId(runner, context);
-
-        deleteDuck(runner, duckId);
-        duckSwim(runner, duckId);
+        createDuckInDB(runner, "yellow", "0.03", "rubber", "quack", "ACTIVE");
+        deleteDuck(runner, "${duckId}");
+        duckSwim(runner, "${duckId}");
         DuckSingleResponse response = new DuckSingleResponse().message("Paws are not found ((((");
         validatePayload(runner, response, HttpStatus.NOT_FOUND);
     }

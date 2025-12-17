@@ -5,7 +5,6 @@ import autotests.payloads.DuckProperties;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
-import com.consol.citrus.context.TestContext;
 import com.consol.citrus.testng.CitrusParameters;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
@@ -61,11 +60,15 @@ public class CreateTests extends DuckActionsClient {
     @Test(description = "Создать деревянную утку")
     @CitrusTest
     public void createWoodDuck(@Optional @CitrusResource TestCaseRunner runner) {
-        databaseUpdate(runner,
-                "insert into DUCK (id, color, height, material, sound, wings_state)\n" +
-                        "values (1338, 'orange', 3.0, 'cheese', 'hrum','ACTIVE');");
-
-        validateDuckInDatabase(runner, "1338", "orange", "3.0", "cheese", "hrum", "ACTIVE");
+        DuckProperties woodDuck = new DuckProperties()
+                .color("red")
+                .height(0.03)
+                .material("rubber")
+                .sound("quack")
+                .wingsState("FIXED");
+        createDuck(runner, woodDuck);
+        extractId(runner);
+        validateDuckInDatabase(runner, "${duckId}", "red", "0.03", "rubber", "quack", "FIXED");
     }
 
     @DataProvider(name = "colorDuckList")

@@ -1,7 +1,6 @@
 package autotests.tests;
 
 import autotests.clients.DuckActionsClient;
-import autotests.payloads.DuckProperties;
 import autotests.payloads.DuckSoundSingleResponse;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
@@ -23,21 +22,12 @@ public class QuackTests extends DuckActionsClient {
     @Test(priority = 1, description = "Корректный нечётный id, корректный звук")
     @CitrusTest
     public void oddQuack(@Optional @CitrusResource TestCaseRunner runner, @Optional @CitrusResource TestContext context) {
-        DuckProperties duckProperties = new DuckProperties()
-                .color("red")
-                .height(0.03)
-                .material("rubber")
-                .sound("quack")
-                .wingsState("FIXED");
+        int duckId = createDuckInDB(runner, "yellow", "0.03", "rubber", "quack", "ACTIVE");
 
-        createDuck(runner, duckProperties);
-        String duckId = getDuckId(runner, context);
-
-        while(Integer.parseInt(duckId) % 2 == 0){
-            createDuck(runner, duckProperties);
-            duckId = getDuckId(runner, context);
+        while(duckId % 2 == 0){
+            duckId = createDuckInDB(runner, "yellow", "0.03", "rubber", "quack", "ACTIVE");
         }
-        duckQuack(runner, duckId, "1", "1");
+        duckQuack(runner, String.valueOf(duckId), "1", "1");
         DuckSoundSingleResponse response = new DuckSoundSingleResponse().sound("quack");
         validatePayload(runner, response, HttpStatus.OK);
     }
@@ -46,22 +36,12 @@ public class QuackTests extends DuckActionsClient {
     @Test(priority = 2, description = "Корректный чётный id, корректный звук")
     @CitrusTest
     public void evenQuack(@Optional @CitrusResource TestCaseRunner runner, @Optional @CitrusResource TestContext context) {
-        DuckProperties duckProperties = new DuckProperties()
-                .color("red")
-                .height(0.03)
-                .material("rubber")
-                .sound("quack")
-                .wingsState("FIXED");
+        int duckId = createDuckInDB(runner, "yellow", "0.03", "rubber", "quack", "ACTIVE");
 
-        createDuck(runner, duckProperties);
-        String duckId = getDuckId(runner, context);
-
-        while(Integer.parseInt(duckId) % 2 != 0){
-            createDuck(runner, duckProperties);
-            duckId = getDuckId(runner, context);
+        while(duckId % 2 != 0){
+            duckId = createDuckInDB(runner, "yellow", "0.03", "rubber", "quack", "ACTIVE");
         }
-
-        duckQuack(runner, duckId, "1", "1");
+        duckQuack(runner, String.valueOf(duckId), "1", "1");
         DuckSoundSingleResponse response = new DuckSoundSingleResponse().sound("moo");
         validatePayload(runner, response, HttpStatus.OK);
     }
