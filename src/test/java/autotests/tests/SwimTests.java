@@ -35,7 +35,10 @@ public class SwimTests extends DuckActionsClient {
     @CitrusTest
     public void nonExistingDuckSwim(@Optional @CitrusResource TestCaseRunner runner, @Optional @CitrusResource TestContext context) {
         createDuckInDB(runner, "yellow", "0.03", "rubber", "quack", "ACTIVE");
-        deleteDuck(runner, "${duckId}");
+        databaseUpdate(runner, """
+                delete from DUCK
+                where id = ${duckId};
+                """);
         duckSwim(runner, "${duckId}");
         DuckSingleResponse response = new DuckSingleResponse().message("Paws are not found ((((");
         validatePayload(runner, response, HttpStatus.NOT_FOUND);

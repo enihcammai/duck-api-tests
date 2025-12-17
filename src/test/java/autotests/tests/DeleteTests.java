@@ -1,16 +1,16 @@
 package autotests.tests;
 
 import autotests.clients.DuckActionsClient;
+import autotests.payloads.DuckSingleResponse;
 import com.consol.citrus.TestCaseRunner;
 import com.consol.citrus.annotations.CitrusResource;
 import com.consol.citrus.annotations.CitrusTest;
 import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.qameta.allure.Story;
+import org.springframework.http.HttpStatus;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Test;
-
-import static com.consol.citrus.actions.ExecuteSQLQueryAction.Builder.query;
 
 @Epic("Тесты на duck-controller")
 @Feature("Удаление уточки")
@@ -21,14 +21,9 @@ public class DeleteTests extends DuckActionsClient {
     @CitrusTest
     public void successfulDeleteDuck(@Optional @CitrusResource TestCaseRunner runner){
         createDuckInDB(runner, "yellow", "0.03", "rubber", "quack", "FIXED");
-        databaseUpdate(runner, """
-                delete from DUCK
-                where id = ${duckId};
-                """);
+        deleteDuck(runner, "${duckId}");
 
-        runner.$(query(testDb)
-                .statement("SELECT COUNT(*) as count FROM DUCK WHERE id = ${duckId}")
-                .validate("count", "0")
-        );
+        DuckSingleResponse response = new DuckSingleResponse().message("Duck is deleted");
+        validatePayload(runner, response, HttpStatus.OK);
     }
 }
